@@ -1,0 +1,30 @@
+// Import and Visualize Google building footprint data using GEE
+
+// 1. Importing the shape file for the region of interest
+var ROI = ee.FeatureCollection('users/user name/name of shape file');
+
+// 2. Importing the Building Footprint Data:
+var Buildings = ee.FeatureCollection('GOOGLE/Research/open-buildings/v3/polygons')
+   .filterBounds(ROI);
+
+// 3. Filtering Building Confidence Levels:   
+var t_065_070 = Buildings.filter('confidence >= 0.65 && confidence < 0.7');
+var t_070_075 = Buildings.filter('confidence >= 0.7 && confidence < 0.75');
+var t_gte_075 = Buildings.filter('confidence >= 0.75');
+
+
+// 4. Adding Layers to the Map:
+
+Map.addLayer(t_065_070, {color: 'FF0000'}, 'Buildings confidence [0.65; 0.7)');
+Map.addLayer(t_070_075, {color: 'FFFF00'}, 'Buildings confidence [0.7; 0.75)');
+Map.addLayer(t_gte_075, {color: '00FF00'}, 'Buildings confidence >= 0.75');
+
+// 5. Count the number of buildings
+var buildingCount = Buildings.size();
+print('Number of buildings in ROI:', buildingCount);
+
+// 6. Optionally, add the count as a property to the ROI
+ROI = ROI.set('building_count', buildingCount);
+
+// 7. Print the ROI with the building count
+print('ROI with building count:', ROI);
